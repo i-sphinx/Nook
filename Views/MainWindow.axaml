@@ -1,20 +1,464 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Nook.ViewModels"
+        xmlns:models="using:Nook.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="980" d:DesignHeight="700"
         x:Class="Nook.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="Nook">
+        Title="Nook — File Organizer"
+        Width="980" Height="720"
+        MinWidth="820" MinHeight="620"
+        Background="#0f1117"
+        TransparencyLevelHint="AcrylicBlur"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="-1">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Window.Styles>
 
+        <!-- ══ GLOBAL ══════════════════════════════════════════════════════ -->
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="#e2e8f0"/>
+            <Setter Property="FontFamily" Value="Inter,Segoe UI,sans-serif"/>
+        </Style>
+
+        <!-- ══ TITLE BAR DRAG ════════════════════════════════════════════ -->
+        <Style Selector="Border.TitleBar">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <!-- ══ CARD ════════════════════════════════════════════════════════ -->
+        <Style Selector="Border.Card">
+            <Setter Property="Background" Value="#161b27"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="BorderBrush" Value="#1e2d45"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- ══ PRIMARY BUTTON ═════════════════════════════════════════════ -->
+        <Style Selector="Button.Primary">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Color="#6C63FF" Offset="0"/>
+                        <GradientStop Color="#A78BFA" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="24,12"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.Primary:pointerover /template/ ContentPresenter">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Color="#7C73FF" Offset="0"/>
+                        <GradientStop Color="#B79BFA" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="RenderTransform" Value="scaleY(1.03)"/>
+        </Style>
+        <Style Selector="Button.Primary:disabled /template/ ContentPresenter">
+            <Setter Property="Opacity" Value="0.4"/>
+        </Style>
+
+        <!-- ══ GHOST BUTTON ════════════════════════════════════════════════ -->
+        <Style Selector="Button.Ghost">
+            <Setter Property="Background" Value="#1e2d45"/>
+            <Setter Property="Foreground" Value="#94a3b8"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#2a3a55"/>
+        </Style>
+        <Style Selector="Button.Ghost:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#263550"/>
+            <Setter Property="TextBlock.Foreground" Value="#e2e8f0"/>
+        </Style>
+        <Style Selector="Button.Ghost:disabled /template/ ContentPresenter">
+            <Setter Property="Opacity" Value="0.35"/>
+        </Style>
+
+        <!-- ══ DANGER BUTTON ═══════════════════════════════════════════════ -->
+        <Style Selector="Button.Danger">
+            <Setter Property="Background" Value="#2a1520"/>
+            <Setter Property="Foreground" Value="#FF6584"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#FF658440"/>
+        </Style>
+        <Style Selector="Button.Danger:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#3a1a25"/>
+        </Style>
+
+        <!-- ══ SUCCESS BUTTON ══════════════════════════════════════════════ -->
+        <Style Selector="Button.Success">
+            <Setter Property="Background" Value="#0d2a1f"/>
+            <Setter Property="Foreground" Value="#43D9A2"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#43D9A240"/>
+        </Style>
+        <Style Selector="Button.Success:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#143520"/>
+        </Style>
+        <Style Selector="Button.Success:disabled /template/ ContentPresenter">
+            <Setter Property="Opacity" Value="0.35"/>
+        </Style>
+
+        <!-- ══ TOGGLE SWITCH ═══════════════════════════════════════════════ -->
+        <Style Selector="ToggleSwitch">
+            <Setter Property="Foreground" Value="#94a3b8"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <!-- ══ SCROLLBAR ═══════════════════════════════════════════════════ -->
+        <Style Selector="ScrollBar">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="ScrollBar /template/ Thumb">
+            <Setter Property="Background" Value="#2a3a55"/>
+        </Style>
+
+    </Window.Styles>
+
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!--  ROOT                                                               -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <Grid RowDefinitions="42,*">
+
+        <!-- ── Custom Title Bar ─────────────────────────────────────────── -->
+        <Border Grid.Row="0" Classes="TitleBar"
+                IsHitTestVisible="True"
+                PointerPressed="TitleBar_PointerPressed">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="18,0">
+                    <Ellipse Width="10" Height="10" Fill="#6C63FF" Margin="0,0,8,0"/>
+                    <TextBlock Text="Nook" FontWeight="Bold" FontSize="14"
+                               Foreground="#e2e8f0" VerticalAlignment="Center"/>
+                    <TextBlock Text="File Organizer" FontSize="12" Foreground="#4a5568"
+                               Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal"
+                            VerticalAlignment="Center" Margin="0,0,12,0" Spacing="4">
+                    <Button Name="MinimizeBtn" Content="─" Click="MinimizeBtn_Click"
+                            Width="32" Height="24" Padding="0"
+                            Background="Transparent" Foreground="#64748b"
+                            FontSize="11" HorizontalContentAlignment="Center"/>
+                    <Button Name="CloseBtn" Content="✕" Click="CloseBtn_Click"
+                            Width="32" Height="24" Padding="0"
+                            Background="Transparent" Foreground="#64748b"
+                            FontSize="11" HorizontalContentAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ── Main Content ─────────────────────────────────────────────── -->
+        <Grid Grid.Row="1" ColumnDefinitions="320,*" Margin="16,0,16,16">
+
+            <!-- ╔═══════════════════════════════════════╗ -->
+            <!-- ║  LEFT PANEL                           ║ -->
+            <!-- ╚═══════════════════════════════════════╝ -->
+            <Grid Grid.Column="0" RowDefinitions="Auto,12,Auto,12,*" Margin="0,0,10,0">
+
+                <!-- Drop Zone -->
+                <Border Grid.Row="0" Classes="Card"
+                        Name="DropZoneBorder"
+                        DragDrop.AllowDrop="True"
+                        DragDrop.Drop="DropZone_Drop"
+                        DragDrop.DragEnter="DropZone_DragEnter"
+                        DragDrop.DragLeave="DropZone_DragLeave"
+                        Padding="24" MinHeight="180"
+                        Cursor="Hand">
+                    <Border.Styles>
+                        <Style Selector="Border#DropZoneBorder[Tag=hover]">
+                            <Setter Property="Background" Value="#1a2540"/>
+                            <Setter Property="BorderBrush" Value="#6C63FF"/>
+                        </Style>
+                    </Border.Styles>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                        <TextBlock Text="📂" FontSize="48" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Drop a folder here"
+                                   FontSize="15" FontWeight="SemiBold"
+                                   Foreground="#cbd5e1" HorizontalAlignment="Center"/>
+                        <TextBlock Text="or"
+                                   FontSize="12" Foreground="#4a5568"
+                                   HorizontalAlignment="Center"/>
+                        <Button Classes="Ghost" Command="{Binding BrowseFolderCommand}"
+                                HorizontalAlignment="Center" Content="Browse Folder"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Selected Folder display -->
+                <Border Grid.Row="2" Classes="Card" Padding="16"
+                        IsVisible="{Binding HasFolder}">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <TextBlock Grid.Column="0" Text="📁" FontSize="20"
+                                   VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                            <TextBlock Text="Selected Folder" FontSize="11"
+                                       Foreground="#4a5568"/>
+                            <TextBlock Text="{Binding SelectedFolderPath}"
+                                       FontSize="12" Foreground="#94a3b8"
+                                       TextTrimming="CharacterEllipsis"
+                                       ToolTip.Tip="{Binding SelectedFolderPath}"/>
+                        </StackPanel>
+                        <Button Grid.Column="2" Content="✕" Classes="Ghost"
+                                Padding="8,6" Margin="8,0,0,0"
+                                FontSize="12" Foreground="#FF6584"
+                                Command="{Binding BrowseFolderCommand}"/>
+                    </Grid>
+                </Border>
+
+                <!-- Options + Stats -->
+                <Border Grid.Row="4" Classes="Card" Padding="20">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Options" FontSize="13"
+                                   FontWeight="SemiBold" Foreground="#6C63FF"/>
+
+                        <ToggleSwitch IsChecked="{Binding IncludeSubfolders}"
+                                      OnContent="Include subfolders"
+                                      OffContent="Top-level files only"/>
+
+                        <ToggleSwitch IsChecked="{Binding ShowPreviewMode}"
+                                      OnContent="Preview mode (no changes)"
+                                      OffContent="Live mode"/>
+
+                        <Rectangle Height="1" Fill="#1e2d45" Margin="0,4"/>
+
+                        <!-- Stats -->
+                        <TextBlock Text="File Summary" FontSize="13"
+                                   FontWeight="SemiBold" Foreground="#6C63FF"/>
+
+                        <ItemsControl ItemsSource="{Binding Categories}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:CategorySummaryViewModel">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,4">
+                                        <TextBlock Grid.Column="0" Text="{Binding Icon}"
+                                                   FontSize="16" Width="28"
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                                   FontSize="12" Foreground="#94a3b8"
+                                                   VerticalAlignment="Center"/>
+                                        <Border Grid.Column="2"
+                                                CornerRadius="8" Padding="6,2"
+                                                IsVisible="{Binding FileCount, Converter={x:Static vm:Converters.IsPositive}}">
+                                            <Border.Background>
+                                                <SolidColorBrush Color="{Binding AccentColor}"
+                                                                 Opacity="0.18"/>
+                                            </Border.Background>
+                                            <TextBlock Text="{Binding FileCount}"
+                                                       FontSize="11" FontWeight="SemiBold">
+                                                <TextBlock.Foreground>
+                                                    <SolidColorBrush Color="{Binding AccentColor}"/>
+                                                </TextBlock.Foreground>
+                                            </TextBlock>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Rectangle Height="1" Fill="#1e2d45" Margin="0,4"/>
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="Total files" FontSize="12" Foreground="#64748b"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding TotalFiles}"
+                                       FontSize="16" FontWeight="Bold"
+                                       Foreground="#e2e8f0"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ╔═══════════════════════════════════════╗ -->
+            <!-- ║  RIGHT PANEL                          ║ -->
+            <!-- ╚═══════════════════════════════════════╝ -->
+            <Grid Grid.Column="1" RowDefinitions="Auto,12,Auto,12,*">
+
+                <!-- Header -->
+                <Border Grid.Row="0" Classes="Card" Padding="24,20">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Text="File Organizer" FontSize="22"
+                                       FontWeight="Bold" Foreground="#e2e8f0"/>
+                            <TextBlock Text="{Binding StatusText}"
+                                       FontSize="13" Foreground="#64748b"/>
+                        </StackPanel>
+
+                        <!-- Action Buttons -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                    Spacing="8" VerticalAlignment="Center">
+                            <Button Classes="Danger" Content="Cancel"
+                                    Command="{Binding CancelOrganizeCommand}"
+                                    IsVisible="{Binding IsBusy}"
+                                    VerticalAlignment="Center"/>
+                            <Button Classes="Success" Content="↩ Undo"
+                                    IsEnabled="{Binding CanUndo}"
+                                    Command="{Binding UndoOrganizeCommand}"
+                                    VerticalAlignment="Center"/>
+                            <Button Classes="Primary"
+                                    IsEnabled="{Binding HasFolder}"
+                                    Command="{Binding OrganizeCommand}"
+                                    VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="✨" FontSize="14" VerticalAlignment="Center"/>
+                                    <TextBlock VerticalAlignment="Center">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0}">
+                                                <Binding Path="ShowPreviewMode"
+                                                         Converter="{x:Static vm:Converters.BoolToPreviewLabel}"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Progress Section -->
+                <Border Grid.Row="2" Classes="Card" Padding="20"
+                        IsVisible="{Binding IsBusy}">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="Organizing files…"
+                                       FontSize="13" Foreground="#94a3b8"/>
+                            <TextBlock Grid.Column="1"
+                                       FontSize="13" Foreground="#6C63FF">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} / {1}">
+                                        <Binding Path="MovedFiles"/>
+                                        <Binding Path="TotalFiles"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Grid>
+                        <Grid>
+                            <Rectangle Height="8" Fill="#1e2d45" RadiusX="4" RadiusY="4"/>
+                            <Border HorizontalAlignment="Left" Height="8"
+                                    CornerRadius="4"
+                                    Width="{Binding Progress,
+                                        Converter={x:Static vm:Converters.ProgressToWidth},
+                                        ConverterParameter=560}">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                                        <GradientStop Color="#6C63FF" Offset="0"/>
+                                        <GradientStop Color="#43D9A2" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Activity Log -->
+                <Border Grid.Row="4" Classes="Card" Padding="0" ClipToBounds="True">
+                    <Grid RowDefinitions="Auto,*">
+                        <!-- Log Header -->
+                        <Border Grid.Row="0" Padding="20,14"
+                                BorderBrush="#1e2d45" BorderThickness="0,0,0,1">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Orientation="Horizontal" Spacing="8"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="📋" FontSize="14"/>
+                                    <TextBlock Text="Activity Log" FontSize="13"
+                                               FontWeight="SemiBold" Foreground="#94a3b8"/>
+                                    <Border CornerRadius="6" Padding="6,2"
+                                            Background="#1e2d45">
+                                        <TextBlock Text="{Binding Logs.Count}"
+                                                   FontSize="11" Foreground="#64748b"/>
+                                    </Border>
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="Clear" Classes="Ghost"
+                                        Padding="10,6" FontSize="11"
+                                        Command="{Binding ClearLogCommand}"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Log Entries -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                                      Padding="8,4">
+                            <ItemsControl ItemsSource="{Binding Logs}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="models:OrganizeLogEntry">
+                                        <Border Padding="12,7" CornerRadius="8" Margin="4,2">
+                                            <Border.Styles>
+                                                <Style Selector="Border:pointerover">
+                                                    <Setter Property="Background" Value="#1a2030"/>
+                                                </Style>
+                                            </Border.Styles>
+                                            <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                                                <Border Grid.Column="0"
+                                                        Width="20" Height="20"
+                                                        CornerRadius="10"
+                                                        Margin="0,0,10,0"
+                                                        VerticalAlignment="Center">
+                                                    <Border.Background>
+                                                        <SolidColorBrush Color="{Binding Color}"
+                                                                         Opacity="0.15"/>
+                                                    </Border.Background>
+                                                    <TextBlock Text="{Binding Icon}"
+                                                               FontSize="10"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center">
+                                                        <TextBlock.Foreground>
+                                                            <SolidColorBrush Color="{Binding Color}"/>
+                                                        </TextBlock.Foreground>
+                                                    </TextBlock>
+                                                </Border>
+                                                <TextBlock Grid.Column="2"
+                                                           Text="{Binding Message}"
+                                                           FontSize="12" Foreground="#94a3b8"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           VerticalAlignment="Center"
+                                                           ToolTip.Tip="{Binding Message}"/>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="{Binding Timestamp,
+                                                               StringFormat=HH:mm:ss}"
+                                                           FontSize="10" Foreground="#334155"
+                                                           VerticalAlignment="Center"
+                                                           Margin="12,0,0,0"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <!-- Empty state -->
+                        <StackPanel Grid.Row="1" VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    IsVisible="{Binding Logs.Count,
+                                        Converter={x:Static vm:Converters.IsZero}}"
+                                    Spacing="10" Opacity="0.4">
+                            <TextBlock Text="🪵" FontSize="36" HorizontalAlignment="Center"/>
+                            <TextBlock Text="No activity yet" FontSize="13"
+                                       Foreground="#64748b" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+        </Grid>
+    </Grid>
 </Window>
