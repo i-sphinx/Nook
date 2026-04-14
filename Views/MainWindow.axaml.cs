@@ -45,7 +45,7 @@ public partial class MainWindow : Window
     // ── Drag & Drop ────────────────────────────────────────────────────────
     private void DropZone_DragEnter(object? sender, DragEventArgs e)
     {
-        if (e.DataTransfer.Formats.Contains(DataFormat.File))
+        if (e.DataTransfer.Contains(DataFormat.File))
         {
             e.DragEffects = DragDropEffects.Copy;
             DropZoneBorder.Tag = "hover";
@@ -65,7 +65,7 @@ public partial class MainWindow : Window
     {
         DropZoneBorder.Tag = null;
 
-        if (!e.DataTransfer.Formats.Contains(DataFormat.File))
+        if (!e.DataTransfer.Contains(DataFormat.File))
             return;
         if (DataContext is not MainWindowViewModel vm)
             return;

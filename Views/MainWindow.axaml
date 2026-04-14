@@ -7,6 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="980" d:DesignHeight="700"
         x:Class="Nook.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
+        x:CompileBindings="True"
         Title="Nook — File Organizer"
         Width="980" Height="720"
         MinWidth="820" MinHeight="620"
@@ -233,6 +234,10 @@
                     <StackPanel Spacing="16">
                         <TextBlock Text="Options" FontSize="13"
                                    FontWeight="SemiBold" Foreground="#6C63FF"/>
+
+                        <ToggleSwitch IsChecked="{Binding OrganizeIntoSystemFolders}"
+                                      OnContent="Move to standard OS folders (Pictures, etc.)"
+                                      OffContent="Group into subfolders in target directory"/>
 
                         <ToggleSwitch IsChecked="{Binding IncludeSubfolders}"
                                       OnContent="Include subfolders"

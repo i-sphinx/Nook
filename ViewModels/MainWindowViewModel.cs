@@ -35,16 +35,24 @@ public partial class MainWindowViewModel : ViewModelBase
     // ── Observable state ──────────────────────────────────────────────────────
 
     [ObservableProperty] private string _selectedFolderPath = string.Empty;
-    [ObservableProperty] private bool   _hasFolder          = false;
-    [ObservableProperty] private bool   _isBusy             = false;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(OrganizeCommand))]
+    private bool   _hasFolder          = false;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(OrganizeCommand))]
+    [NotifyCanExecuteChangedFor(nameof(UndoOrganizeCommand))]
+    private bool   _isBusy             = false;
     [ObservableProperty] private bool   _isDragOver         = false;
     [ObservableProperty] private double _progress           = 0;
     [ObservableProperty] private string _statusText         = "Drop a folder or click Browse to get started";
     [ObservableProperty] private int    _totalFiles         = 0;
     [ObservableProperty] private int    _movedFiles         = 0;
-    [ObservableProperty] private bool   _canUndo            = false;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(UndoOrganizeCommand))]
+    private bool   _canUndo            = false;
     [ObservableProperty] private bool   _includeSubfolders  = false;
     [ObservableProperty] private bool   _showPreviewMode    = false;
+    [ObservableProperty] private bool   _organizeIntoSystemFolders = true;
 
     public ObservableCollection<OrganizeLogEntry> Logs    { get; } = new();
     public ObservableCollection<CategorySummaryViewModel> Categories { get; } = new();
@@ -177,6 +185,19 @@ public partial class MainWindowViewModel : ViewModelBase
                     }
 
                     var destDir = Path.Combine(SelectedFolderPath, cat.FolderName);
+                    if (OrganizeIntoSystemFolders)
+                    {
+                        var specialFolder = GetSystemFolderForCategory(cat.Type);
+                        if (specialFolder != null)
+                        {
+                            var basePath = Environment.GetFolderPath(specialFolder.Value);
+                            if (!string.IsNullOrEmpty(basePath))
+                            {
+                                destDir = Path.Combine(basePath, "Nook");
+                            }
+                        }
+                    }
+
                     Directory.CreateDirectory(destDir);
 
                     var destFile = GetUniqueDestination(destDir, Path.GetFileName(file));
@@ -320,5 +341,17 @@ public partial class MainWindowViewModel : ViewModelBase
             counter++;
         }
         return dest;
+    }
+
+    private Environment.SpecialFolder? GetSystemFolderForCategory(CategoryType type)
+    {
+        return type switch
+        {
+            CategoryType.Images => Environment.SpecialFolder.MyPictures,
+            CategoryType.Videos => Environment.SpecialFolder.MyVideos,
+            CategoryType.Audio => Environment.SpecialFolder.MyMusic,
+            CategoryType.Documents => Environment.SpecialFolder.MyDocuments,
+            _ => null
+        };
     }
 }
